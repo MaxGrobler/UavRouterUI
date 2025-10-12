@@ -79,8 +79,6 @@
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/compressed/k3125ka0pe-{0}-muycvpuwrr-muycvpuwrr.gz
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/compressed/6ta0vbtk50-{0}-87fc7y1x7t-87fc7y1x7t.gz
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/compressed/6qg90v9crf-{0}-jfsiqqwiad-jfsiqqwiad.gz
-/Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/compressed/3o3piqdcl4-{0}-sqhni8dmn4-sqhni8dmn4.gz
-/Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/compressed/csr3o6lf9f-{0}-sqhni8dmn4-sqhni8dmn4.gz
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/staticwebassets.build.json
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/staticwebassets.build.json.cache
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/staticwebassets.development.json
@@ -90,3 +88,7 @@
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/MyRazorApp.pdb
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/MyRazorApp.genruntimeconfig.cache
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/ref/MyRazorApp.dll
+/Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/MyRazorApp.sourcelink.json
+/Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/scopedcss/Pages/Index.cshtml.rz.scp.css
+/Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/compressed/3o3piqdcl4-{0}-sbvs6i8zwa-sbvs6i8zwa.gz
+/Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/compressed/csr3o6lf9f-{0}-sbvs6i8zwa-sbvs6i8zwa.gz

@@ -1,8 +1,61 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Uav Router";
+    ViewData["Title"] = "Low Risk Routing";
 }
 
+<!-- ✅ Leaflet CSS (no integrity or crossorigin) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    
+<!-- Map background -->
+<div id="map"></div>
+
+<!-- Foreground UI -->
+<div class="main-content">
+    <!-- UAV Column (Left) -->
+    <div class="uav-column">
+        <h3>UAVs</h3>
+
+        <div class="uav-card">
+            <h5>Recon Drone</h5>
+            <p>Weight: 25kg</p>
+            <p>Fuel Efficiency: 0.8 L/km</p>
+            <p>Capacity: 5kg</p>
+        </div>
+
+        <div class="uav-card">
+            <h5>Cargo Drone</h5>
+            <p>Weight: 40kg</p>
+            <p>Fuel Efficiency: 1.2 L/km</p>
+            <p>Capacity: 12kg</p>
+        </div>
+
+        <button class="add-drone-btn">+ Add Drone</button>
+    </div>
+
+    <!-- Route Column (Right) -->
+    <div class="route-column">
+        <h3>Route Information</h3>
+        <p><strong>Distance:</strong></p>
+        <p><strong>Airspeed:</strong></p>
+        <p><strong>Flight Time:</strong></p>
+        <p><strong>Safety Index:</strong></p>
+
+        <div class="route-result">
+            <p>Select a drone and plot a route to begin.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ Leaflet JS (no integrity or crossorigin) -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Initialise the interactive map -->
+<script>
+    const map = L.map('map').setView([33.7756, -84.3963], 14); // Georgia Tech default
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+</script>
