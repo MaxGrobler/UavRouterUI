@@ -1,11 +1,9 @@
-/* ===================== */
-/*  GLOBAL STYLES        */
-/* ===================== */
+
 *, *::before, *::after {
     box-sizing: border-box;
-}
+}/*includes everything (padding and content etc) into width and height*/
 
-/* Base layout */
+/* stuff for body*/
 body {
     margin: 0;
     padding: 0;
@@ -15,9 +13,6 @@ body {
     overflow: hidden;
 }
 
-/* ===================== */
-/*  MAP BACKGROUND       */
-/* ===================== */
 #map {
     position: fixed;
     top: 0;
@@ -27,19 +22,14 @@ body {
     z-index: 0;
 }
 
-/* ===================== */
-/*  MAIN UI CONTAINER    */
-/* ===================== */
-/* Keeps columns layered above the map but allows map clicks elsewhere */
+
+/* Keeps columns above the map - can still use map */
 .main-content {
     position: relative;
     z-index: 2;
-    pointer-events: none; /* map remains clickable except under columns */
+    pointer-events: none; /* can still click map - not under columns */
 }
 
-/* ===================== */
-/*  LEFT (UAV) COLUMN    */
-/* ===================== */
 .uav-column {
     position: fixed;
     top: 2vh;
@@ -54,12 +44,9 @@ body {
 
     padding: 15px;
     overflow-y: auto;
-    pointer-events: auto; /* keep this interactive */
+    pointer-events: auto; /* allows it to be interactive */
 }
 
-/* ===================== */
-/*  RIGHT (ROUTE) COLUMN */
-/* ===================== */
 .route-column {
     position: fixed;
     top: 2vh;
@@ -77,15 +64,13 @@ body {
     pointer-events: auto;
 }
 
-/* ===================== */
-/*  CONTENT STYLING      */
-/* ===================== */
+
 .uav-card {
     background-color: #f0f0f0;
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 15px;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease;/*how long the transform takes - slight magnification */
 }
 
 .uav-card:hover {

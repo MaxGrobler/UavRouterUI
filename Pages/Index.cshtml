@@ -1,39 +1,32 @@
 ﻿@page
-@model IndexModel
+@model UavRouteUI.Pages.IndexModel
 @{
     ViewData["Title"] = "Low Risk Routing";
 }
 
-<!-- ✅ Leaflet CSS (no integrity or crossorigin) -->
+<!-- leaflet map link-->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-<!-- Map background -->
 <div id="map"></div>
 
-<!-- Foreground UI -->
+<!-- UI stuff-->
 <div class="main-content">
-    <!-- UAV Column (Left) -->
+    <!-- UI left column - UAV cards-->
     <div class="uav-column">
         <h3>UAVs</h3>
-
-        <div class="uav-card">
-            <h5>Recon Drone</h5>
-            <p>Weight: 25kg</p>
-            <p>Fuel Efficiency: 0.8 L/km</p>
-            <p>Capacity: 5kg</p>
-        </div>
-
-        <div class="uav-card">
-            <h5>Cargo Drone</h5>
-            <p>Weight: 40kg</p>
-            <p>Fuel Efficiency: 1.2 L/km</p>
-            <p>Capacity: 12kg</p>
-        </div>
+        @foreach (var uav in Model.Uavs)
+            {
+                <div class="uav-card">
+                    <h5>@uav.Name</h5>
+                    <p>Make: @uav.Make</p>
+                    <p>Model: @uav.Model</p>
+                </div>
+            }
 
         <button class="add-drone-btn">+ Add Drone</button>
     </div>
 
-    <!-- Route Column (Right) -->
+    <!-- right column - route info-->
     <div class="route-column">
         <h3>Route Information</h3>
         <p><strong>Distance:</strong></p>
@@ -47,15 +40,15 @@
     </div>
 </div>
 
-<!-- ✅ Leaflet JS (no integrity or crossorigin) -->
+<!-- leaflet JS link -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Initialise the interactive map -->
+<!-- Initialise leaflet map -->
 <script>
-    const map = L.map('map').setView([33.7756, -84.3963], 14); // Georgia Tech default
+    const map = L.map('map').setView([51.3781, -2.3597], 14); /* just bath for now*/
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {/* load map tiles and zoom correctly*/
         maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors & Stadia Maps'
     }).addTo(map);
 </script>

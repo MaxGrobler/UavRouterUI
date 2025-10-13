@@ -90,5 +90,5 @@
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/ref/MyRazorApp.dll
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/MyRazorApp.sourcelink.json
 /Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/scopedcss/Pages/Index.cshtml.rz.scp.css
-/Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/compressed/3o3piqdcl4-{0}-sbvs6i8zwa-sbvs6i8zwa.gz
-/Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/compressed/csr3o6lf9f-{0}-sbvs6i8zwa-sbvs6i8zwa.gz
+/Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/compressed/3o3piqdcl4-{0}-6zc5nz37l6-6zc5nz37l6.gz
+/Users/maxgrobler/MyRazorApp/obj/Debug/net10.0/compressed/csr3o6lf9f-{0}-6zc5nz37l6-6zc5nz37l6.gz
