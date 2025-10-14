@@ -15,13 +15,13 @@
     <div class="uav-column">
         <h3>UAVs</h3>
         @foreach (var uav in Model.Uavs)
-            {
-                <div class="uav-card">
-                    <h5>@uav.Name</h5>
-                    <p>Make: @uav.Make</p>
-                    <p>Model: @uav.Model</p>
-                </div>
-            }
+        {
+            <div class="uav-card">
+                <h5>@uav.Name</h5>
+                <p>Make: @uav.Make</p>
+                <p>Model: @uav.Model</p>
+            </div>
+        }
 
         <button class="add-drone-btn">+ Add Drone</button>
     </div>
@@ -45,10 +45,44 @@
 
 <!-- Initialise leaflet map -->
 <script>
-    const map = L.map('map').setView([51.3781, -2.3597], 14); /* just bath for now*/
+    // Initialise map centered on Bath
+    // Where is my laptop? can i use that for this?
+    const map = L.map('map').setView([51.3781, -2.3597], 14);
 
-    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {/* load map tiles and zoom correctly*/
+    // Add dark base map tiles
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors & Stadia Maps'
     }).addTo(map);
+
+    // Array to store marker coordinates (LatLng objects)
+    const routePoints = [];
+
+    // Polyline for connecting route markers
+    let routeLine = null;
+
+    // Function: handles double-click events
+    function onMapDblClick(e) {
+        const latlng = e.latlng;
+
+        // Add marker at clicked location
+        L.marker(latlng)
+            .addTo(map)
+            .bindPopup(`Waypoint ${routePoints.length + 1}`)
+            .openPopup();
+
+        // Store point in array
+        routePoints.push(latlng);
+
+        // Remove old polyline (if it exists)
+        if (routeLine) {
+            map.removeLayer(routeLine);
+        }
+
+        // Draw a new polyline connecting all markers
+        routeLine = L.polyline(routePoints, { color: 'cyan', weight: 3 }).addTo(map);
+    }
+
+    // Attach the double-click event (⚠️ don't call the function immediately)
+    map.on('dblclick', onMapDblClick);
 </script>
