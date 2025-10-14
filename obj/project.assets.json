@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/maxgrobler/MyRazorApp/MyRazorApp.csproj",
+      "projectUniqueName": "/Users/maxgrobler/Documents/UAV Project/UavRouterUI/MyRazorApp.csproj",
       "projectName": "MyRazorApp",
-      "projectPath": "/Users/maxgrobler/MyRazorApp/MyRazorApp.csproj",
+      "projectPath": "/Users/maxgrobler/Documents/UAV Project/UavRouterUI/MyRazorApp.csproj",
       "packagesPath": "/Users/maxgrobler/.nuget/packages/",
-      "outputPath": "/Users/maxgrobler/MyRazorApp/obj/",
+      "outputPath": "/Users/maxgrobler/Documents/UAV Project/UavRouterUI/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/maxgrobler/.nuget/NuGet/NuGet.Config"
