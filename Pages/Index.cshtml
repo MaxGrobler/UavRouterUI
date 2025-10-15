@@ -37,6 +37,9 @@
         <div class="route-result">
             <p>Select a drone and plot a route to begin.</p>
         </div>
+        <button class="routeButton" id="routeButton" disabled>
+            plan route
+        </button>
     </div>
 </div>
 
@@ -47,7 +50,8 @@
 <script>
     // Initialise map centered on Bath
     // Where is my laptop? can i use that for this?
-    const map = L.map('map').setView([51.3781, -2.3597], 14);
+    const map = L.map('map', { doubleClickZoom: false }).setView([51.3781, -2.3597], 14);
+
 
     // Add dark base map tiles
     L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
@@ -58,10 +62,19 @@
     // Array to store marker coordinates (LatLng objects)
     const routePoints = [];
 
-    // Polyline for connecting route markers
+
     let routeLine = null;
 
-    // Function: handles double-click events
+    function arrayCheck() {
+        if (routePoints.length >= 2) {
+            routeButton.disabled = false;
+
+        } else {
+            routeButton.disabled = true;
+        }
+
+    }
+
     function onMapDblClick(e) {
         const latlng = e.latlng;
 
@@ -74,15 +87,17 @@
         // Store point in array
         routePoints.push(latlng);
 
-        // Remove old polyline (if it exists)
+        // Remove all old lines 
         if (routeLine) {
             map.removeLayer(routeLine);
         }
 
-        // Draw a new polyline connecting all markers
+        // Draw a new line connecting markers instead of adding new one each time
         routeLine = L.polyline(routePoints, { color: 'cyan', weight: 3 }).addTo(map);
+        arrayCheck();
     }
 
-    // Attach the double-click event (⚠️ don't call the function immediately)
+    // Attach the double-click event 
     map.on('dblclick', onMapDblClick);
+
 </script>

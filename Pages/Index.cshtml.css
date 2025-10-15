@@ -1,7 +1,10 @@
-
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
-}/*includes everything (padding and content etc) into width and height*/
+}
+
+/*includes everything (padding and content etc) into width and height*/
 
 /* stuff for body*/
 body {
@@ -27,7 +30,8 @@ body {
 .main-content {
     position: relative;
     z-index: 2;
-    pointer-events: none; /* can still click map - not under columns */
+    pointer-events: none;
+    /* can still click map - not under columns */
 }
 
 .uav-column {
@@ -38,13 +42,15 @@ body {
     height: 96vh;
 
     background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(6px);      /* subtle glass look */
+    backdrop-filter: blur(6px);
+    /* subtle glass look */
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 
     padding: 15px;
     overflow-y: auto;
-    pointer-events: auto; /* allows it to be interactive */
+    pointer-events: auto;
+    /* allows it to be interactive */
 }
 
 .route-column {
@@ -70,7 +76,8 @@ body {
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 15px;
-    transition: transform 0.2s ease;/*how long the transform takes - slight magnification */
+    transition: transform 0.2s ease;
+    /*how long the transform takes - slight magnification */
 }
 
 .uav-card:hover {
@@ -89,5 +96,14 @@ body {
 }
 
 .add-drone-btn:hover {
+    background-color: #0056b3;
+}
+
+.routeButton {
+
+    transition: background-color 0.2s ease;
+}
+
+.routeButton:hover {
     background-color: #0056b3;
 }
