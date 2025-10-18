@@ -37,7 +37,7 @@
         <div class="route-result">
             <p>Select a drone and plot a route to begin.</p>
         </div>
-        <button class="routeButton" id="routeButton" disabled>
+        <button onclick="PushWaypoints()" class="routeButton" id="routeButton" disabled>
             plan route
         </button>
     </div>
@@ -75,6 +75,7 @@
 
     }
 
+
     function onMapDblClick(e) {
         const latlng = e.latlng;
 
@@ -85,7 +86,7 @@
             .openPopup();
 
         // Store point in array
-        routePoints.push(latlng);
+        routePoints.push(latlng);//instead of latlng should be model of routePoints
 
         // Remove all old lines 
         if (routeLine) {
@@ -99,5 +100,22 @@
 
     // Attach the double-click event 
     map.on('dblclick', onMapDblClick);
+
+    async function PushWaypoints() {
+        console.log("Im calling PushWaypoints function");
+        console.log("Sending these waypoints:", routePoints);
+        const myjsonstring = JSON.stringify(routePoints);
+        console.log("Sending these waypoints as JSON:", myjsonstring);
+
+        const response = await fetch('/api/UavRoute/planRoute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: myjsonstring
+        });
+
+        const editedPoints = await response.json();
+        console.log("Edited waypoints from backend:", editedPoints);
+    }
+
 
 </script>
