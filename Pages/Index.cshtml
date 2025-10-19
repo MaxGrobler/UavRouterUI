@@ -59,6 +59,16 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors & Stadia Maps'
     }).addTo(map);
 
+    class WayPoint {
+        constructor(latitude, longitude, altitudeMeters, routeId = 0, waypointId = 0) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.altitudeMeters = altitudeMeters;
+            this.routeId = routeId;
+            this.waypointId = waypointId;
+        }
+    }
+
     // Array to store marker coordinates (LatLng objects)
     const routePoints = [];
 
@@ -77,26 +87,30 @@
 
 
     function onMapDblClick(e) {
-        const latlng = e.latlng;
+        const lat = e.latlng.lat;
+        const lon = e.latlng.lng;
+        const alt = 2000.0;
 
-        // Add marker at clicked location
-        L.marker(latlng)
+        const thisWaypoint = new WayPoint(lat, lon, alt);
+        routePoints.push(thisWaypoint);
+
+        L.marker(e.latlng)
             .addTo(map)
-            .bindPopup(`Waypoint ${routePoints.length + 1}`)
+            .bindPopup(`Waypoint ${routePoints.length}`)
             .openPopup();
 
-        // Store point in array
-        routePoints.push(latlng);//instead of latlng should be model of routePoints
+        if (routeLine) map.removeLayer(routeLine);
 
-        // Remove all old lines 
-        if (routeLine) {
-            map.removeLayer(routeLine);
+        const coords = routePoints.map(p => [p.latitude, p.longitude]);
+        console.log("coords:", coords);
+
+        if (coords.length >= 2) {
+            routeLine = L.polyline(coords, { color: 'cyan', weight: 3 }).addTo(map);
         }
 
-        // Draw a new line connecting markers instead of adding new one each time
-        routeLine = L.polyline(routePoints, { color: 'cyan', weight: 3 }).addTo(map);
         arrayCheck();
     }
+
 
     // Attach the double-click event 
     map.on('dblclick', onMapDblClick);
@@ -104,13 +118,13 @@
     async function PushWaypoints() {
         console.log("Im calling PushWaypoints function");
         console.log("Sending these waypoints:", routePoints);
-        const myjsonstring = JSON.stringify(routePoints);
+        const myjsonstring = JSON.stringify(routePoints);//serializing the array
         console.log("Sending these waypoints as JSON:", myjsonstring);
 
-        const response = await fetch('/api/UavRoute/planRoute', {
+        const response = await fetch('http://localhost:5188/api/UavRoute/PlanRoute', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: myjsonstring
+            body: JSON.stringify(routePoints)
         });
 
         const editedPoints = await response.json();
