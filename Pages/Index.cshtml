@@ -52,7 +52,6 @@
     // Where is my laptop? can i use that for this?
     const map = L.map('map', { doubleClickZoom: false }).setView([51.3781, -2.3597], 14);
 
-
     // Add dark base map tiles
     L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
@@ -72,35 +71,42 @@
     // Array to store marker coordinates (LatLng objects)
     const routePoints = [];
 
-
     let routeLine = null;
 
     function arrayCheck() {
+        // Enable the route button when there are at least 2 waypoints
+        const routeButton = document.getElementById("routeButton");
         if (routePoints.length >= 2) {
             routeButton.disabled = false;
-
         } else {
             routeButton.disabled = true;
         }
-
     }
 
-
     function onMapDblClick(e) {
+        // Get lat/lon of double-clicked position
         const lat = e.latlng.lat;
         const lon = e.latlng.lng;
+        modifyMap(lat, lon);
+    }
+
+    function modifyMap(lat, lon) {
+        // Create new waypoint
         const alt = 2000.0;
 
         const thisWaypoint = new WayPoint(lat, lon, alt);
         routePoints.push(thisWaypoint);
 
-        L.marker(e.latlng)
+        // Add marker to map
+        L.marker([lat, lon])
             .addTo(map)
             .bindPopup(`Waypoint ${routePoints.length}`)
             .openPopup();
 
+        // Remove old route line if it exists
         if (routeLine) map.removeLayer(routeLine);
 
+        // Generate new route line from current waypoints
         const coords = routePoints.map(p => [p.latitude, p.longitude]);
         console.log("coords:", coords);
 
@@ -108,9 +114,9 @@
             routeLine = L.polyline(coords, { color: 'cyan', weight: 3 }).addTo(map);
         }
 
+        // Check whether the plan button should be enabled
         arrayCheck();
     }
-
 
     // Attach the double-click event 
     map.on('dblclick', onMapDblClick);
@@ -118,18 +124,25 @@
     async function PushWaypoints() {
         console.log("Im calling PushWaypoints function");
         console.log("Sending these waypoints:", routePoints);
-        const myjsonstring = JSON.stringify(routePoints);//serializing the array
+        const myjsonstring = JSON.stringify(routePoints); // serializing the array
         console.log("Sending these waypoints as JSON:", myjsonstring);
 
+        // Send the waypoints to backend for route planning
         const response = await fetch('http://localhost:5188/api/UavRoute/PlanRoute', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(routePoints)
         });
 
+        // Parse the edited points returned by backend
         const editedPoints = await response.json();
         console.log("Edited waypoints from backend:", editedPoints);
+
+        // Add markers for each edited waypoint returned by backend
+        for (const w of editedPoints) {
+            const lat = w.latitude;
+            const lon = w.longitude;
+            modifyMap(lat, lon);
+        }
     }
-
-
 </script>
