@@ -37,8 +37,11 @@
         <div class="route-result">
             <p>Select a drone and plot a route to begin.</p>
         </div>
+        <button onclick="GetPlacesToAvoid()" class="routeButton" id="routeButton" disabled>
+            Show Risk
+        </button>
         <button onclick="PushWaypoints()" class="routeButton" id="routeButton" disabled>
-            plan route
+            Plan Route
         </button>
     </div>
 </div>
@@ -125,7 +128,7 @@
         console.log("Im calling PushWaypoints function");
         console.log("Sending these waypoints:", [...routePoints]);
 
-        
+
         // Send the waypoints to backend for route planning
         const response = await fetch('http://localhost:5188/api/UavRoute/PlanRoute', {
             method: 'POST',
@@ -146,4 +149,39 @@
             modifyMap(lat, lon);
         }
     }
+    async function GetPlacesToAvoid() {
+
+        const safetybox_response = await fetch('http://localhost:5188/api/UavRoute/GetSafetyBox', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(routePoints)//sending routePoints to backend function
+        });
+
+        if (!safetybox_response.ok) {
+            console.error("Error calling GetSafetyBox:", safetybox_response.status);
+            return null;
+        }
+
+        const safetybox_data = await safetybox_response.json();//turning response into json
+        console.log("Response from API:", safetybox_data);
+
+        const minLat = safetybox_data.minLat;
+        const minLon = safetybox_data.minLon;
+        const maxLat = safetybox_data.maxLat;
+        const maxLon = safetybox_data.maxLon;
+
+        const url = `http://localhost:5188/api/UavRoute/ThingsToAvoid` +
+        `?minimumLat=${minLat}&maximumLat=${maxLat}` +
+        `&minimumLon=${minLon}&maximumLon=${maxLon}`;
+
+        const thingstoavoid_response = await fetch(url);
+
+        const data = await thingstoavoid_response.json(); 
+        console.log("Places to avoid:", data); 
+
+        return data;
+    }
+
+
+
 </script>
