@@ -48,7 +48,7 @@
 
 <!-- Initialise leaflet map -->
 <script>
-    // Initialise map centered on Bath
+    // Initialise map on Bath for now
     // Where is my laptop? can i use that for this?
     const map = L.map('map', { doubleClickZoom: false }).setView([51.3781, -2.3597], 14);
 
@@ -109,7 +109,7 @@
         // Generate new route line from current waypoints
         const coords = routePoints.map(p => [p.latitude, p.longitude]);
         console.log("coords:", coords);
-
+        console.log("routePoints:", routePoints);
         if (coords.length >= 2) {
             routeLine = L.polyline(coords, { color: 'cyan', weight: 3 }).addTo(map);
         }
@@ -118,15 +118,14 @@
         arrayCheck();
     }
 
-    // Attach the double-click event 
+    // making the double-click event 
     map.on('dblclick', onMapDblClick);
 
     async function PushWaypoints() {
         console.log("Im calling PushWaypoints function");
-        console.log("Sending these waypoints:", routePoints);
-        const myjsonstring = JSON.stringify(routePoints); // serializing the array
-        console.log("Sending these waypoints as JSON:", myjsonstring);
+        console.log("Sending these waypoints:", [...routePoints]);
 
+        
         // Send the waypoints to backend for route planning
         const response = await fetch('http://localhost:5188/api/UavRoute/PlanRoute', {
             method: 'POST',
@@ -139,6 +138,8 @@
         console.log("Edited waypoints from backend:", editedPoints);
 
         // Add markers for each edited waypoint returned by backend
+        //routePoints = [];
+        routePoints.length = 0;
         for (const w of editedPoints) {
             const lat = w.latitude;
             const lon = w.longitude;

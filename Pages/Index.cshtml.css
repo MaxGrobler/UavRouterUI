@@ -43,7 +43,6 @@ body {
 
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(6px);
-    /* subtle glass look */
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 
@@ -77,7 +76,7 @@ body {
     padding: 15px;
     margin-bottom: 15px;
     transition: transform 0.2s ease;
-    /*how long the transform takes - slight magnification */
+    /*how long the transform takes - small magnification thingy*/
 }
 
 .uav-card:hover {
