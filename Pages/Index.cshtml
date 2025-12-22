@@ -37,12 +37,17 @@
         <div class="route-result">
             <p>Select a drone and plot a route to begin.</p>
         </div>
-        <button onclick="GetPlacesToAvoid()" class="routeButton" id="routeButton" disabled>
-            Show Risk
+
+
+        <button onclick="GetDanger()" class="dangerButton" id="dangerButton" disabled>
+            Get Danger
         </button>
         <button onclick="PushWaypoints()" class="routeButton" id="routeButton" disabled>
             Plan Route
         </button>
+
+
+
     </div>
 </div>
 
@@ -81,8 +86,10 @@
         const routeButton = document.getElementById("routeButton");
         if (routePoints.length >= 2) {
             routeButton.disabled = false;
+            dangerButton.disabled = false;
         } else {
             routeButton.disabled = true;
+            dangerButton.disabled = true;
         }
     }
 
@@ -171,17 +178,46 @@
         const maxLon = safetybox_data.maxLon;
 
         const url = `http://localhost:5188/api/UavRoute/ThingsToAvoid` +
-        `?minimumLat=${minLat}&maximumLat=${maxLat}` +
-        `&minimumLon=${minLon}&maximumLon=${maxLon}`;
+            `?minimumLat=${minLat}&maximumLat=${maxLat}` +
+            `&minimumLon=${minLon}&maximumLon=${maxLon}`;
 
         const thingstoavoid_response = await fetch(url);
 
-        const data = await thingstoavoid_response.json(); 
-        console.log("Places to avoid:", data); 
+        const data = await thingstoavoid_response.json();
+        console.log("Places to avoid:", data);
 
         return data;
     }
 
+    async function AvoidHazards() {
+        //call checkAlongRoute from backend
+        // if checkAlongRoute returns false - nothing changes, else it edits route
+    }
+
+    var myIcon = L.divIcon({
+  className: '',
+  html: '<div style="width:25px;height:25px;border-radius:50%;background:blue;border:2px solid white;"></div>',
+  iconSize: [25, 25],
+  iconAnchor: [12, 12]
+});
 
 
+    async function GetDanger() {
+        const getDangerResponse = await fetch('http://localhost:5188/api/UavRoute/GetDanger', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(routePoints)
+        });
+
+        const dangerPoints = await getDangerResponse.json();
+        console.log("map features", dangerPoints);
+
+        //get list to show on map
+        for(let i = 0; i < dangerPoints.length; i++)
+        {
+            L.marker([dangerPoints[i].latitude,dangerPoints[i].longitude],{icon: myIcon}  ).addTo(map)
+        }
+
+    }
+    
 </script>
