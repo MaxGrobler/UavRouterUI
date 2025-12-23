@@ -22,8 +22,6 @@
                 <p>Model: @uav.Model</p>
             </div>
         }
-
-        <button class="add-drone-btn">+ Add Drone</button>
     </div>
 
     <!-- right column - route info-->
@@ -81,16 +79,45 @@
 
     let routeLine = null;
 
-    function arrayCheck() {
+    function dangerCheck() {
         // Enable the route button when there are at least 2 waypoints
-        const routeButton = document.getElementById("routeButton");
+
+        const dangerButton = document.getElementById("dangerButton");
+
+
         if (routePoints.length >= 2) {
-            routeButton.disabled = false;
+            //routeButton.disabled = false;
             dangerButton.disabled = false;
         } else {
-            routeButton.disabled = true;
+            //routeButton.disabled = true;
             dangerButton.disabled = true;
         }
+    }
+
+    var myIcon = L.divIcon({
+        className: '',
+        html: '<div style="width:25px;height:25px;border-radius:50%;background:blue;border:2px solid white;"></div>',
+        iconSize: [25, 25],
+        iconAnchor: [12, 12]
+
+    });
+
+    async function GetDanger() {
+        const getDangerResponse = await fetch('http://localhost:5188/api/UavRoute/GetDanger', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(routePoints)
+        });
+
+        const dangerPoints = await getDangerResponse.json();
+        console.log("map features", dangerPoints);
+
+        //get list to show on map
+        for (let i = 0; i < dangerPoints.length; i++) {
+            L.marker([dangerPoints[i].latitude, dangerPoints[i].longitude], { icon: myIcon }).addTo(map)
+        }
+        document.getElementById("routeButton").disabled = false;//enables plan route button
+
     }
 
     function onMapDblClick(e) {
@@ -125,7 +152,7 @@
         }
 
         // Check whether the plan button should be enabled
-        arrayCheck();
+        dangerCheck();
     }
 
     // making the double-click event 
@@ -194,30 +221,5 @@
         // if checkAlongRoute returns false - nothing changes, else it edits route
     }
 
-    var myIcon = L.divIcon({
-  className: '',
-  html: '<div style="width:25px;height:25px;border-radius:50%;background:blue;border:2px solid white;"></div>',
-  iconSize: [25, 25],
-  iconAnchor: [12, 12]
-});
 
-
-    async function GetDanger() {
-        const getDangerResponse = await fetch('http://localhost:5188/api/UavRoute/GetDanger', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(routePoints)
-        });
-
-        const dangerPoints = await getDangerResponse.json();
-        console.log("map features", dangerPoints);
-
-        //get list to show on map
-        for(let i = 0; i < dangerPoints.length; i++)
-        {
-            L.marker([dangerPoints[i].latitude,dangerPoints[i].longitude],{icon: myIcon}  ).addTo(map)
-        }
-
-    }
-    
 </script>

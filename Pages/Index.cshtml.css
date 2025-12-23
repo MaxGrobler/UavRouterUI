@@ -94,10 +94,6 @@ body {
     transition: background-color 0.2s ease;
 }
 
-.add-drone-btn:hover {
-    background-color: #0056b3;
-}
-
 .routeButton {
 
     transition: background-color 0.2s ease;
