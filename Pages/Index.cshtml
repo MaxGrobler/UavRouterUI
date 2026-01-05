@@ -16,210 +16,249 @@
         <h3>UAVs</h3>
         @foreach (var uav in Model.Uavs)
         {
-            <div class="uav-card">
+            <div class="uav-card" data-uav-id="@uav.UavId" onclick="selectUav(this, @uav.UavId)">
                 <h5>@uav.Name</h5>
                 <p>Make: @uav.Make</p>
                 <p>Model: @uav.Model</p>
             </div>
+
         }
     </div>
 
-    <!-- right column - route info-->
-    <div class="route-column">
-        <h3>Route Information</h3>
-        <p><strong>Distance:</strong></p>
-        <p><strong>Airspeed:</strong></p>
-        <p><strong>Flight Time:</strong></p>
-        <p><strong>Safety Index:</strong></p>
+        <!-- right column - route info-->
+        <div class="route-column">
+            <h3>Route Information</h3>
+            <p><strong>Distance:</strong> <span id="distance">-</span></p>
+            <!-- p for paragraph strong for strong text/bold -->
+            <p><strong>Airspeed:</strong> <span id="airspeed">-</span></p>
+            <p><strong>Flight Time:</strong> <span id="time">-</span></p>
+            <p><strong>Can make flight:</strong> <span id="can">-</span></p>
 
-        <div class="route-result">
-            <p>Select a drone and plot a route to begin.</p>
+            <div class="route-result">
+                <p>Select a drone and plot a route to begin.</p>
+            </div>
+
+
+            <button onclick="GetDanger()" class="dangerButton" id="dangerButton" disabled>
+                Get Danger
+            </button>
+            <button onclick="PushWaypoints()" class="routeButton" id="routeButton" disabled>
+                Plan Route
+            </button>
         </div>
-
-
-        <button onclick="GetDanger()" class="dangerButton" id="dangerButton" disabled>
-            Get Danger
-        </button>
-        <button onclick="PushWaypoints()" class="routeButton" id="routeButton" disabled>
-            Plan Route
-        </button>
-
-
-
-    </div>
+    
 </div>
 
-<!-- leaflet JS link -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- leaflet JS link -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Initialise leaflet map -->
-<script>
-    // Initialise map on Bath for now
-    // Where is my laptop? can i use that for this?
-    const map = L.map('map', { doubleClickZoom: false }).setView([51.3781, -2.3597], 14);
+    <!-- Initialise leaflet map -->
+    <script>
+        // Initialise map on Bath for now
+        // Where is my laptop? can i use that for this?
+        const map = L.map('map', { doubleClickZoom: false }).setView([51.3781, -2.3597], 14);
 
-    // Add dark base map tiles
-    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors & Stadia Maps'
-    }).addTo(map);
+        // Add dark base map tiles
+        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors & Stadia Maps'
+        }).addTo(map);
 
-    class WayPoint {
-        constructor(latitude, longitude, altitudeMeters, routeId = 0, waypointId = 0) {
-            this.latitude = latitude;
-            this.longitude = longitude;
-            this.altitudeMeters = altitudeMeters;
-            this.routeId = routeId;
-            this.waypointId = waypointId;
+        class WayPoint {
+            constructor(latitude, longitude, altitudeMeters, routeId = 0, waypointId = 0) {
+                this.latitude = latitude;
+                this.longitude = longitude;
+                this.altitudeMeters = altitudeMeters;
+                this.routeId = routeId;
+                this.waypointId = waypointId;
+            }
         }
-    }
 
-    // Array to store marker coordinates (LatLng objects)
-    const routePoints = [];
+        // Array to store marker coordinates (LatLng objects)
+        const routePoints = [];
 
-    let routeLine = null;
+        let routeLine = null;
+        let selectedUavId = null;
 
-    function dangerCheck() {
-        // Enable the route button when there are at least 2 waypoints
+        function selectUav(cardElement, uavId) {
+            selectedUavId = uavId;
 
-        const dangerButton = document.getElementById("dangerButton");
+            // remove highlight from all cards
+            const cards = document.querySelectorAll(".uav-card");
+            cards.forEach(c => c.classList.remove("selected"));
 
+            // highlight the clicked card
+            cardElement.classList.add("selected");
 
-        if (routePoints.length >= 2) {
-            //routeButton.disabled = false;
-            dangerButton.disabled = false;
-        } else {
-            //routeButton.disabled = true;
-            dangerButton.disabled = true;
+            ButtonUpdate();
         }
-    }
 
-    var myIcon = L.divIcon({
-        className: '',
-        html: '<div style="width:25px;height:25px;border-radius:50%;background:blue;border:2px solid white;"></div>',
-        iconSize: [25, 25],
-        iconAnchor: [12, 12]
 
-    });
+        var myIcon = L.divIcon({
+            className: '',
+            html: '<div style="width:25px;height:25px;border-radius:50%;background:blue;border:2px solid white;"></div>',
+            iconSize: [25, 25],
+            iconAnchor: [12, 12]
 
-    async function GetDanger() {
-        const getDangerResponse = await fetch('http://localhost:5188/api/UavRoute/GetDanger', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(routePoints)
         });
 
-        const dangerPoints = await getDangerResponse.json();
-        console.log("map features", dangerPoints);
+        async function GetDanger() {
+            const getDangerResponse = await fetch('http://localhost:5188/api/UavRoute/GetDanger', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(routePoints)
 
-        //get list to show on map
-        for (let i = 0; i < dangerPoints.length; i++) {
-            L.marker([dangerPoints[i].latitude, dangerPoints[i].longitude], { icon: myIcon }).addTo(map)
-        }
-        document.getElementById("routeButton").disabled = false;//enables plan route button
+            });
 
-    }
+            const dangerPoints = await getDangerResponse.json();
+            console.log("map features", dangerPoints);
 
-    function onMapDblClick(e) {
-        // Get lat/lon of double-clicked position
-        const lat = e.latlng.lat;
-        const lon = e.latlng.lng;
-        modifyMap(lat, lon);
-    }
+            //get list to show on map
+            for (let i = 0; i < dangerPoints.length; i++) {
+                L.marker([dangerPoints[i].latitude, dangerPoints[i].longitude], { icon: myIcon }).addTo(map)
+            }
+            document.getElementById("routeButton").disabled = false;//enables plan route button
 
-    function modifyMap(lat, lon) {
-        // Create new waypoint
-        const alt = 2000.0;
-
-        const thisWaypoint = new WayPoint(lat, lon, alt);
-        routePoints.push(thisWaypoint);
-
-        // Add marker to map
-        L.marker([lat, lon])
-            .addTo(map)
-            .bindPopup(`Waypoint ${routePoints.length}`)
-            .openPopup();
-
-        // Remove old route line if it exists
-        if (routeLine) map.removeLayer(routeLine);
-
-        // Generate new route line from current waypoints
-        const coords = routePoints.map(p => [p.latitude, p.longitude]);
-        console.log("coords:", coords);
-        console.log("routePoints:", routePoints);
-        if (coords.length >= 2) {
-            routeLine = L.polyline(coords, { color: 'cyan', weight: 3 }).addTo(map);
         }
 
-        // Check whether the plan button should be enabled
-        dangerCheck();
-    }
-
-    // making the double-click event 
-    map.on('dblclick', onMapDblClick);
-
-    async function PushWaypoints() {
-        console.log("Im calling PushWaypoints function");
-        console.log("Sending these waypoints:", [...routePoints]);
-
-
-        // Send the waypoints to backend for route planning
-        const response = await fetch('http://localhost:5188/api/UavRoute/PlanRoute', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(routePoints)
-        });
-
-        // Parse the edited points returned by backend
-        const editedPoints = await response.json();
-        console.log("Edited waypoints from backend:", editedPoints);
-
-        // Add markers for each edited waypoint returned by backend
-        //routePoints = [];
-        routePoints.length = 0;
-        for (const w of editedPoints) {
-            const lat = w.latitude;
-            const lon = w.longitude;
+        function onMapDblClick(e) {
+            // Get lat/lon of double-clicked position
+            const lat = e.latlng.lat;
+            const lon = e.latlng.lng;
             modifyMap(lat, lon);
         }
-    }
-    async function GetPlacesToAvoid() {
 
-        const safetybox_response = await fetch('http://localhost:5188/api/UavRoute/GetSafetyBox', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(routePoints)//sending routePoints to backend function
-        });
+        let isRebuilding = false;
 
-        if (!safetybox_response.ok) {
-            console.error("Error calling GetSafetyBox:", safetybox_response.status);
-            return null;
+        function modifyMap(lat, lon) {
+            // Create new waypoint
+            const alt = 2000.0;
+
+            const thisWaypoint = new WayPoint(lat, lon, alt);
+            routePoints.push(thisWaypoint);
+
+            // Add marker to map
+            L.marker([lat, lon])
+                .addTo(map)
+                .bindPopup(`Waypoint ${routePoints.length}`)
+                .openPopup();
+
+            // Remove old route line if it exists
+            if (routeLine) map.removeLayer(routeLine);
+
+            // Generate new route line from current waypoints
+            const coords = routePoints.map(p => [p.latitude, p.longitude]);
+            console.log("coords:", coords);
+            console.log("routePoints:", routePoints);
+            if (coords.length >= 2) {
+                routeLine = L.polyline(coords, { color: 'cyan', weight: 3 }).addTo(map);
+            }
+
+            // Check whether the plan button should be enabled
+            if (!isRebuilding) {
+                ButtonUpdate();
+            }
+
         }
 
-        const safetybox_data = await safetybox_response.json();//turning response into json
-        console.log("Response from API:", safetybox_data);
+        // making the double-click event 
+        map.on('dblclick', onMapDblClick);
 
-        const minLat = safetybox_data.minLat;
-        const minLon = safetybox_data.minLon;
-        const maxLat = safetybox_data.maxLat;
-        const maxLon = safetybox_data.maxLon;
-
-        const url = `http://localhost:5188/api/UavRoute/ThingsToAvoid` +
-            `?minimumLat=${minLat}&maximumLat=${maxLat}` +
-            `&minimumLon=${minLon}&maximumLon=${maxLon}`;
-
-        const thingstoavoid_response = await fetch(url);
-
-        const data = await thingstoavoid_response.json();
-        console.log("Places to avoid:", data);
-
-        return data;
-    }
-
-    async function AvoidHazards() {
-        //call checkAlongRoute from backend
-        // if checkAlongRoute returns false - nothing changes, else it edits route
-    }
+        async function PushWaypoints() {
+            console.log("Im calling PushWaypoints function");
+            console.log("Sending these waypoints:", [...routePoints]);
 
 
-</script>
+            // Send the waypoints to backend for route planning
+            const response = await fetch('http://localhost:5188/api/UavRoute/PlanRoute', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ uavId: selectedUavId, points: routePoints })
+
+            });
+
+            // Parse the edited points returned by backend
+            const data = await response.json();
+            const editedPoints = data.route;
+
+
+            // Add markers for each edited waypoint returned by backend
+            //routePoints = [];
+
+            isRebuilding = true;
+            routePoints.length = 0;
+            for (const w of editedPoints) {
+                modifyMap(w.latitude, w.longitude);
+            }
+            isRebuilding = false;
+
+            // setting the values in the html for the UI
+            document.getElementById("routeButton").disabled = false;
+            document.getElementById("time").textContent = data.routeTimeHrs.toFixed(2) + " hrs";//to 2 decimal places
+            document.getElementById("can").textContent = data.canMakeFlight ? "Yes" : "No";
+            document.getElementById("distance").textContent = data.distanceKm.toFixed(2) + " km";
+            document.getElementById("airspeed").textContent = data.cruiseSpeedKph.toFixed(0) + " kph";
+
+        }
+
+        async function GetPlacesToAvoid() {
+
+            const safetybox_response = await fetch('http://localhost:5188/api/UavRoute/GetSafetyBox', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(routePoints)//sending routePoints to backend function
+            });
+
+            if (!safetybox_response.ok) {
+                console.error("Error calling GetSafetyBox:", safetybox_response.status);
+                return null;
+            }
+
+            const safetybox_data = await safetybox_response.json();//turning response into json
+            console.log("Response from API:", safetybox_data);
+
+            const minLat = safetybox_data.minLat;
+            const minLon = safetybox_data.minLon;
+            const maxLat = safetybox_data.maxLat;
+            const maxLon = safetybox_data.maxLon;
+
+            const url = `http://localhost:5188/api/UavRoute/ThingsToAvoid` +
+                `?minimumLat=${minLat}&maximumLat=${maxLat}` +
+                `&minimumLon=${minLon}&maximumLon=${maxLon}`;
+
+            const thingstoavoid_response = await fetch(url);
+
+            const data = await thingstoavoid_response.json();
+            console.log("Places to avoid:", data);
+
+            return data;
+        }
+
+        async function AvoidHazards() {
+            //call checkAlongRoute from backend
+            // if checkAlongRoute returns false - nothing changes, else it edits route
+        }
+
+        function ButtonUpdate() {
+
+            const dangerButton = document.getElementById("dangerButton");
+            const routeButton = document.getElementById("routeButton");
+
+            const hasUav = selectedUavId !== null;
+            const hasPoints = routePoints.length >= 2;
+
+            // Only allow "Get Danger" when a UAV is selected AND there are 2 waypoints
+            dangerButton.disabled = !(hasUav && hasPoints);
+
+            // Plan Route stays locked until GetDanger succeeds (your chosen flow)
+            routeButton.disabled = true;
+        }
+
+
+
+
+        //TODO:
+        //add logic to do calculations into that funciton too
+        //deal with buttons enabling etc (potentially ignore - not necessary for ti to work just a good idea)
+
+    </script>
